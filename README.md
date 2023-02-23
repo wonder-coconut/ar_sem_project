@@ -31,6 +31,8 @@ Future versions will void this in favour of command line arguments.
 
 ## Test output :   
 ### Image text detection :  
+![Figure_1](https://user-images.githubusercontent.com/53872723/220915066-50005c26-6810-4deb-a3f1-9c5b8fd1d388.png)
+
 ### Video text detection :
 
 ## TODO

@@ -1,3 +1,4 @@
 pytesseract
 opencv-contrib-python
 imutils
+matplotlib

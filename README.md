@@ -33,7 +33,11 @@ Future versions will void this in favour of command line arguments.
 ### Image text detection :  
 ![Figure_1](https://user-images.githubusercontent.com/53872723/220915066-50005c26-6810-4deb-a3f1-9c5b8fd1d388.png)
 
+
 ### Video text detection :
+https://user-images.githubusercontent.com/53872723/220920836-36a49481-18a4-4101-90f4-57a6f3f102f3.mp4
+
+
 
 ## TODO
 1. Improve video latency (currently skipping every 20th frame to improve performance)

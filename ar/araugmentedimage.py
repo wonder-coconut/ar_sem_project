@@ -33,20 +33,23 @@ while True:
         if m.distance < 0.75 * n.distance:
             goodMatches.append(m)
     
-    print(len(goodMatches))
+    #print(len(goodMatches))
     imgFeatures = cv2.drawMatches(imgTarget, kp1, imgWebCam, kp2, goodMatches, None, flags=2)
     
     if(len(goodMatches) > 20) :
         srcPts = np.float32([kp1[m.queryIdx].pt for m in goodMatches]).reshape(-1,1,2)
         dstPts = np.float32([kp2[m.trainIdx].pt for m in goodMatches]).reshape(-1,1,2)
         matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
-        print(matrix)
+        #print(matrix)
         pts = np.float32([[0,0],[0,hT],[wT,hT],[wT,0]]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts, matrix)
         img2 = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
+        
+        imgWarp = cv2.warpPerspective(imgVideo, matrix, (imgWebCam.shape[1],imgWebCam.shape[0]))
 
     cv2.imshow('img2',img2)
-    cv2.imshow('imgFeatures', imgFeatures)
+    cv2.imshow('imgWarp',imgWarp)
+    #cv2.imshow('imgFeatures', imgFeatures)
     #cv2.imshow('webcam', imgWebCam)
     
     if cv2.waitKey(2) & 0xFF == ord('q'):

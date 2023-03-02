@@ -39,6 +39,5 @@ https://user-images.githubusercontent.com/53872723/222406217-047c004f-0154-4507-
 
 
 ## TODO
-1. Improve video latency (currently skipping every 20th frame to improve performance)
-2. Explore more accurate text recognition engines
-3. Switch to live camera feed instead of a local video feed
+1. Explore more accurate text recognition engines
+2. Object augmentation on detected feature points 

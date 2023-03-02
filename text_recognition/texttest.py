@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('TkAgg', force=True)
 import matplotlib.pyplot as plt
 import re
+import sys
 
 def imageTextDetection(imagePath='../assets/images/image1.jpg'):
     img = cv2.imread(imagePath)
@@ -25,11 +26,17 @@ def imageTextDetection(imagePath='../assets/images/image1.jpg'):
     plt.imshow(img)
     plt.show()
 
-def videoTextDetection(videoPath="../assets/videos/Inglourious_Basterds_Intro.mp4"):
+def videoTextDetection(webcamon = True, videoPath="../assets/videos/Inglourious_Basterds_Intro.mp4"):
     font_scale = 1.5
     font = cv2.FONT_HERSHEY_SIMPLEX
 
-    videocap = cv2.VideoCapture(videoPath)
+    if(webcamon):
+        videocap = cv2.VideoCapture(0)
+        videocap.set(3,1280)
+        videocap.set(4,720)
+        videocap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
+    else:
+        videocap = cv2.VideoCapture(videoPath)
 
     if (not videocap.isOpened()):
         cv2.VideoCapture(0)
@@ -40,7 +47,7 @@ def videoTextDetection(videoPath="../assets/videos/Inglourious_Basterds_Intro.mp
     while True:
         ret,frame = videocap.read()
         counter += 1
-        if((counter%20) == 0):
+        if((counter%5) == 0):
 
             imgH, imgW,_ =frame.shape
             x0,y0,w0,h0, = 0,0,imgH,imgW
@@ -66,5 +73,20 @@ def videoTextDetection(videoPath="../assets/videos/Inglourious_Basterds_Intro.mp
     videocap.release()
     cv2.destroyAllWindows()
 
-#imageTextDetection()
-#videoTextDetection()
+n = len(sys.argv)
+
+if(n == 1):
+    print("no argument passed, exiting")
+else:
+    if(sys.argv[1] == "image"):
+        if(n == 3):
+            imageTextDetection(sys.argv[2])
+        else:
+            imageTextDetection()
+    elif(sys.argv[1] == "video"):
+        if(n==4):
+            videoTextDetection(sys.argv[2], sys.argv[3])
+        else:
+            videoTextDetection()
+    else:
+        print("incorrect arguments")

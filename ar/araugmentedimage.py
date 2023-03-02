@@ -20,13 +20,11 @@ imgVideo = cv2.resize(imgVideo, (wT,hT))
 
 orb = cv2.ORB_create(nfeatures=1000)
 kp1, des1 = orb.detectAndCompute(imgTarget,None)
-#imgTarget = cv2.drawKeypoints(imgTarget, kp1, None)
 
 
 while True:
     success, imgWebCam = videocap.read()
     kp2, des2 = orb.detectAndCompute(imgWebCam,None)
-    #imgWebCam = cv2.drawKeypoints(imgWebCam, kp2, None)
     
     bf = cv2.BFMatcher()
     matches = bf.knnMatch(des1,des2,k=2)
@@ -37,10 +35,19 @@ while True:
     
     print(len(goodMatches))
     imgFeatures = cv2.drawMatches(imgTarget, kp1, imgWebCam, kp2, goodMatches, None, flags=2)
+    
+    if(len(goodMatches) > 20) :
+        srcPts = np.float32([kp1[m.queryIdx].pt for m in goodMatches]).reshape(-1,1,2)
+        dstPts = np.float32([kp2[m.trainIdx].pt for m in goodMatches]).reshape(-1,1,2)
+        matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
+        print(matrix)
+        pts = np.float32([[0,0],[0,hT],[wT,hT],[wT,0]]).reshape(-1,1,2)
+        dst = cv2.perspectiveTransform(pts, matrix)
+        img2 = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
+
+    cv2.imshow('img2',img2)
     cv2.imshow('imgFeatures', imgFeatures)
-    #cv2.imshow('imgTarget', imgTarget)
-    #cv2.imshow('myVid',imgVideo)
-    cv2.imshow('webcam', imgWebCam)
+    #cv2.imshow('webcam', imgWebCam)
     
     if cv2.waitKey(2) & 0xFF == ord('q'):
         break

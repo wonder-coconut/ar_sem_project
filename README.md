@@ -22,12 +22,8 @@ A work in progress build to create and develop text-based augmented reality, wit
 > source <em>/path/to/virtualenv/target/directory/</em>bin/activate
 2. Install the necessary library dependencies
 > pip3 install -r requirements.txt
-3. (Subject to change) Navigate to text_recognition/ and run the test.py script
-> cd text_recognition/  
-> python3 test.py
 
-As of this moment, the script takes in an image/video input from a local assets/(images/videos) folder. I have consciously git ignored the videos folder to save storage space, so you are free to plug in your own image/video and modify the script to run the media. Just uncomment the specific function call and add in your address path as a parameter.  
-Future versions will void this in favour of command line arguments.
+The directory contains 2 subparts : text recognition and augmented reality. The plan is to combine them both into a single project for text based anchoring for AR.
 
 ## Test output :   
 ### Image text detection :  
@@ -37,6 +33,9 @@ Future versions will void this in favour of command line arguments.
 ### Video text detection :
 https://user-images.githubusercontent.com/53872723/220920836-36a49481-18a4-4101-90f4-57a6f3f102f3.mp4
 
+
+### Augmented Image feature point and bounding box :
+https://user-images.githubusercontent.com/53872723/222406217-047c004f-0154-4507-a28a-bdf723ce80a6.mp4
 
 
 ## TODO

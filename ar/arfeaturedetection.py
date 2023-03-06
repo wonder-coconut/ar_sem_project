@@ -5,7 +5,7 @@ videocap = cv2.VideoCapture(0)
 videocap.set(3,1280)
 videocap.set(4,720)
 
-imgTarget = cv2.imread('../assets/images/watchmen.jpg')
+imgTarget = cv2.imread('../assets/images/Introduction_to_Algorithms_Third_Edition_(2009)/Introduction_to_Algorithms_Third_Edition_(2009)1024_216.jpg')
 scale = 50
 width = int(imgTarget.shape[1] * scale / 100)
 height = int(imgTarget.shape[0] * scale / 100)

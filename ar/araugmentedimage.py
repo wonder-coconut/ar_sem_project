@@ -9,18 +9,22 @@ camera_parameters = np.array([[1.41405685e+03, 0.00000000e+00, 6.59924138e+02],[
 DEFAULT_COLOR = (0, 0, 0)
 
 def main():
-
+    #initialize homography
+    homography_matrix = None
+    #webcam stream capture
     videocap = cv2.VideoCapture(0)
     videocap.set(3,1280)
     videocap.set(4,720)
-
-    imgTarget = cv2.imread('../assets/images/watchmen.jpg')
-    scale = 50
-    width = int(imgTarget.shape[1] * scale / 100)
-    height = int(imgTarget.shape[0] * scale / 100)
-    dsize = (width,height)
-    imgTarget = cv2.resize(imgTarget, dsize)
+    #image target
+    imgTarget = cv2.imread('../assets/images/watchmen.jpg') #add a ,0 parameter for black and white
     
+    #scale = 50
+    #width = int(imgTarget.shape[1] * scale / 100)
+    #height = int(imgTarget.shape[0] * scale / 100)
+    #dsize = (width,height)
+    #imgTarget = cv2.resize(imgTarget, dsize)
+    
+    #3d model
     dir_name = os.getcwd()
     obj = OBJ(os.path.join(dir_name, '../assets/models/fox.obj'), swapyz=True)
 
@@ -47,30 +51,25 @@ def main():
         if(len(goodMatches) > 20) :
             srcPts = np.float32([kp1[m.queryIdx].pt for m in goodMatches]).reshape(-1,1,2)
             dstPts = np.float32([kp2[m.trainIdx].pt for m in goodMatches]).reshape(-1,1,2)
-            matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
-            #print(matrix)
+            homography_matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
+            #print(homography_matrix)
             pts = np.float32([[0,0],[0,hT],[wT,hT],[wT,0]]).reshape(-1,1,2)
-            dst = cv2.perspectiveTransform(pts, matrix)
+            dst = cv2.perspectiveTransform(pts, homography_matrix)
             frame = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
 
-            if matrix is not None:
+            if homography_matrix is not None:
+                #print("homography exists")
                 try:
-                    projection = projection_matrix(camera_parameters, matrix)
+                    projection = projection_matrix(camera_parameters, homography_matrix)
                     frame = render(frame, obj, projection, imgTarget, False)
                 except:
                     pass
-            #imgWarp = cv2.warpPerspective(imgVideo, matrix, (imgWebCam.shape[1],imgWebCam.shape[0]))
-            #maskNew = np.zeros((imgWebCam.shape[0],imgWebCam.shape[1]), np.uint8)
-            #cv2.fillPoly(maskNew,[np.int32(dst)],(255,255,255))
-            #maskInv = cv2.bitwise_not(maskNew)
-            #imgAug = cv2.bitwise_and(imgAug,imgAug,mask = maskInv)
 
-
-        cv2.imshow('frame',frame)
-        #cv2.imshow('masknew', maskInv)
-        #cv2.imshow('imgWarp',imgWarp)
-        #cv2.imshow('imgFeatures', imgFeatures)
-        #cv2.imshow('webcam', imgWebCam)
+        try:
+            print(frame)
+            cv2.imshow('frame',frame)
+        except Exception as e:
+            print(e)
 
         if cv2.waitKey(2) & 0xFF == ord('q'):
             break
@@ -84,8 +83,8 @@ def render(img, obj, projection, model, color=False):
     Render a loaded obj model into the current video frame
     """
     vertices = obj.vertices
-    scale_matrix = np.eye(3) * 3
-    h, w = model.shape
+    scale_matrix = np.eye(3) * 10
+    h, w, c = model.shape
 
     for face in obj.faces:
         face_vertices = face[0]
@@ -97,11 +96,15 @@ def render(img, obj, projection, model, color=False):
         dst = cv2.perspectiveTransform(points.reshape(-1, 1, 3), projection)
         imgpts = np.int32(dst)
         if color is False:
+            #print(f"rendering face : {face}")
             cv2.fillConvexPoly(img, imgpts, DEFAULT_COLOR)
         else:
+            #print(f"rendering face : {face}")
             color = hex_to_rgb(face[-1])
             color = color[::-1]  # reverse
             cv2.fillConvexPoly(img, imgpts, color)
+        
+    return img #ONE SINGLE COPY PASTE ERROR SET ME BACK TWO WEEKS IN MY GODDAMN PROJECT I WILL SHOOT SOMEONE I CANT ANYMORE
 
 def projection_matrix(camera_parameters, homography):
     """

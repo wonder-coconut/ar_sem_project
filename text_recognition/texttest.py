@@ -47,7 +47,7 @@ def videoTextDetection(webcamon = True, videoPath="../assets/videos/Inglourious_
     while True:
         ret,frame = videocap.read()
         counter += 1
-        if((counter%5) == 0):
+        if((counter%3) == 0):
 
             imgH, imgW,_ =frame.shape
             x0,y0,w0,h0, = 0,0,imgH,imgW

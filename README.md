@@ -62,3 +62,7 @@ https://user-images.githubusercontent.com/53872723/227186004-aa7d909f-9d97-4512-
 
 ### Multi Augmented Image rendering :
 https://user-images.githubusercontent.com/53872723/227186093-15cbc0b9-e416-48b1-a263-e924fca2f300.mp4
+
+### Textbook augmented image detection using a dynamic image database:
+https://user-images.githubusercontent.com/53872723/228807295-dda20539-81eb-4d4e-9f5f-db367497d3b1.mp4
+

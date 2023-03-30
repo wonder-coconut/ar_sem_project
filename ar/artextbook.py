@@ -19,87 +19,67 @@ def main():
 
     scale = 50
 
-    imgTargeta = cv2.imread('../assets/images/textbook_test/Introduction_to_Algorithms_Third_Edition_(2009)1024_144.jpg',0) #add a ,0 parameter for black and white
-    imgTargetb = cv2.imread('../assets/images/textbook_test/Introduction_to_Algorithms_Third_Edition_(2009)1024_117.jpg',0)
+    dir_name = os.getcwd()
+
+    imgTargets = []
+    hT = []
+    wT = []
+    kp1 = []
+    des1 = []
+    orb = cv2.ORB_create(nfeatures=2000)
+    image_dir = os.path.join(dir_name, '../assets/images/textbook_test')
     
-    width = int(imgTargeta.shape[1] * scale / 100)
-    height = int(imgTargeta.shape[0] * scale / 100)
-    dsize = (width,height)
-    imgTargeta = cv2.resize(imgTargeta, dsize)
-    width = int(imgTargetb.shape[1] * scale / 100)
-    height = int(imgTargetb.shape[0] * scale / 100)
-    dsize = (width,height)
-    imgTargetb = cv2.resize(imgTargetb, dsize)
+    targets = 0
+    for image in os.listdir(image_dir):
+        targets += 1
+        imgTargets.append(cv2.imread(f'{image_dir}/{image}',0))
+        width = int(imgTargets[-1].shape[1] * scale / 100)
+        height = int(imgTargets[-1].shape[0] * scale / 100)
+        dsize = (width,height)
+        imgTargets[-1] = cv2.resize(imgTargets[-1], dsize)
+        ht, wt = imgTargets[-1].shape
+        kp, des = orb.detectAndCompute(imgTargets[-1],None)
+        hT.append(ht)
+        wT.append(wt)
+        kp1.append(kp)
+        des1.append(des)
 
     #3d model
-    dir_name = os.getcwd()
     obja = OBJ(os.path.join(dir_name, '../assets/models/rat.obj'), swapyz=True)
     objb = OBJ(os.path.join(dir_name, '../assets/models/fox.obj'), swapyz=True)
-
-    haT, waT = imgTargeta.shape
-    hbT, wbT = imgTargetb.shape
-
-    orb = cv2.ORB_create(nfeatures=2000)
-    kpa1, desa1 = orb.detectAndCompute(imgTargeta,None)
-    kpb1, desb1 = orb.detectAndCompute(imgTargetb,None)
-
     
     bf = cv2.BFMatcher()    
 
-
     while True:
         success, imgWebCam = videocap.read()
-        kpa2, desa2 = orb.detectAndCompute(imgWebCam,None)
-        kpb2, desb2 = orb.detectAndCompute(imgWebCam,None)
-        matchesa = bf.knnMatch(desa1,desa2,k=2)
-        matchesb = bf.knnMatch(desb1,desb2,k=2)
-        goodMatchesa = []
-        goodMatchesb = []
-        for m,n in matchesa:
-            if m.distance < 0.75 * n.distance:
-                goodMatchesa.append(m)
-        for m,n in matchesb:
-            if m.distance < 0.75 * n.distance:
-                goodMatchesb.append(m)
+        kp2, des2 = orb.detectAndCompute(imgWebCam,None)
+        matches_targets = []
+        
+        i = 0
+        while(i < targets):
+            matches_targets.append(bf.knnMatch(des1[i],des2,k=2))
+            i += 1
+        
+        goodMatches_targets = []
+        for matches in matches_targets:
+            goodMatches = []
+            for m,n in matches:
+                if m.distance < 0.75 * n.distance:
+                    goodMatches.append(m)
+            goodMatches_targets.append(goodMatches)
 
-        print(len(goodMatchesa))
+        i = 0
+        for goodMatches in goodMatches_targets:
+            if(len(goodMatches) > 20):
+                srcPts = np.float32([kp1[i][m.queryIdx].pt for m in goodMatches]).reshape(-1,1,2)
+                dstPts = np.float32([kp2[m.trainIdx].pt for m in goodMatches]).reshape(-1,1,2)
+                homography_matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
+                pts = np.float32([[0,0],[0,hT[i]],[wT[i],hT[i]],[wT[i],0]]).reshape(-1,1,2)
+                dst = cv2.perspectiveTransform(pts, homography_matrix)
+                frame = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
+                print(f"image {i} detected")
+            i += 1
 
-        if(len(goodMatchesa) > 20) :
-            srcPts = np.float32([kpa1[m.queryIdx].pt for m in goodMatchesa]).reshape(-1,1,2)
-            dstPts = np.float32([kpa2[m.trainIdx].pt for m in goodMatchesa]).reshape(-1,1,2)
-            homography_matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
-            #print(homography_matrix)
-            pts = np.float32([[0,0],[0,haT],[waT,haT],[waT,0]]).reshape(-1,1,2)
-            dst = cv2.perspectiveTransform(pts, homography_matrix)
-            frame = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
-
-            if homography_matrix is not None:
-                #print("homography exists")
-                try:
-                    projection = projection_matrix(camera_parameters, homography_matrix)
-                    frame = render(frame, obja, projection, imgTargeta, False)
-                except:
-                    pass
-
-
-        if(len(goodMatchesb) > 20) :
-            srcPts = np.float32([kpb1[m.queryIdx].pt for m in goodMatchesb]).reshape(-1,1,2)
-            dstPts = np.float32([kpb2[m.trainIdx].pt for m in goodMatchesb]).reshape(-1,1,2)
-            homography_matrix, mask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 5)
-            #print(homography_matrix)
-            pts = np.float32([[0,0],[0,hbT],[wbT,hbT],[wbT,0]]).reshape(-1,1,2)
-            dst = cv2.perspectiveTransform(pts, homography_matrix)
-            frame = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
-
-            if homography_matrix is not None:
-                #print("homography exists")
-                try:
-                    projection = projection_matrix(camera_parameters, homography_matrix)
-                    frame = render(frame, objb, projection, imgTargetb, False)
-                except:
-                    pass
-
-        print(f"Matches A : {len(goodMatchesa)} \t Matches B : {len(goodMatchesb)}")
         cv2.imshow('frame',frame)
 
         if cv2.waitKey(2) & 0xFF == ord('q'):

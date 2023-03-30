@@ -1,14 +1,14 @@
 # Text Detection and Recognition
 
-Rishab Ramanathan   
-19XJ1A0558
+<b>Rishab Ramanathan   
+19XJ1A0558</b>
 
 A work in progress build to create and develop text-based augmented reality, with the goal of school textbook applications in mind. Ar this stage, the application can run text detection on a video stream.
 
 ### System pre-requisites:
-- python3-tk (Tkinter - for GUI representation of matplotlib, used for the purpose of viewing the output dynamically instead of writing to a file)
-- tesseract-ocr (OCR library for character recognition. Use the following reference for installation : https://pyimagesearch.com/2017/07/03/installing-tesseract-for-ocr/)
-- pip3 (Python package manager)
+- <b>python3-tk</b> (Tkinter - for GUI representation of matplotlib, used for the purpose of viewing the output dynamically instead of writing to a file)
+- <b>tesseract-ocr</b> (OCR library for character recognition. Use the following reference for installation : https://pyimagesearch.com/2017/07/03/installing-tesseract-for-ocr/)
+- <b>pip3</b> (Python package manager)
 
 ### Python pre-requisites:
 - pytesseract
@@ -32,10 +32,17 @@ At this stage, the script can detect and recognize text in real time in a webcam
 The current script can augment 3D models onto an augmented image using feature detection and homography. Further development has also enabled multiple simultaneous models augmented on different and unique augmented images.  
 But as far as the goal is concerned, we need to augment the model onto a text based anchor/have some trigger based mechanism for rendering, based on text.
 Issues:  
-1. Text as a standalone cannot be used as an anchor point at this stage with this model of augmentation, as text contains too few feature points for unique detection.
-2. One potential solution that was planned was to use the bounding boxes born out of text recognition, and use those coordinates to augment the model. Unfortunately, this won't be as possible as initially planned as the bounding box are coordinates of the screen's 2D plane. This same issue is resolved in AR using homography with the image target.
-3. The final potentially succesful solution is to have some form of augmented image in each page of the textbook (perhaps like a school logo, publisher logo, etc), and use the text detected on the page to individually augment the specific model, depending on the text. Basically, use the augmented image as the anchor and the trigger for AR, and use the text to filter the model. 
-Note : Image recognition accuracy (number of matches) improves by scaling down the image target. Need to explore. 
+1. Text as a <b>standalone</b> cannot be used as an anchor point at this stage with this model of augmentation, as text contains too few feature points for unique detection.
+2. One potential solution that was planned was to use the bounding boxes born out of text recognition, and use those coordinates to augment the model. Unfortunately, this won't be as possible as initially planned as the bounding box are coordinates of the <b>screen's</b> 2D plane. This same issue is resolved in AR using homography with the <b>image target</b>, which does not exist for pure text.
+3. The final potentially succesful solution is to have some form of augmented image in each page of the textbook (perhaps like a school logo, publisher logo, etc), and use the text detected on the page to individually augment the specific model, depending on the text. Basically, use the augmented image as the anchor and the trigger for AR, and use the text to filter the model.
+4. Another potential solution is to instead use the entire page as a seperate augmented image. Possible problems involve issues with accuracy (differentiating similar looking pages)
+
+As of this moment, textbook pages can be used as a moderately viable image for augmentation, here's why I suspect that to be possible:
+1.  The text contrasting features as an image is not used in the feature detection by the program, but rather the <b>blocks of text</b>, and the <b>shape</b> it encompasses is used as a feature to detect.
+2. The anchoring works even at lower resolutions where text is illegible, so potentially features are not text dependent.
+3. External images/diagrams in the textbook page help establish uniqueness. Even pure text pages can work as anchors, but further testing is required to see the saturation point (in number of image targets) at which pages cannot be differentiated.
+
+<b>Note</b> : Image recognition accuracy (number of matches) improves by scaling down the image target. Need to explore. 
 ## Test output :   
 ### Image text detection :  
 ![Figure_1](https://user-images.githubusercontent.com/53872723/220915066-50005c26-6810-4deb-a3f1-9c5b8fd1d388.png)

@@ -4,15 +4,19 @@ import math
 import os
 from objloader import *
 
-camera_parameters = np.array([[1.41405685e+03, 0.00000000e+00, 6.59924138e+02],[0.00000000e+00, 1.42191604e+03, 4.72514351e+02],[0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
-#camera_parameters = np.array([[800, 0, 720], [0, 800, 360], [0, 0, 1]])
+camera_parameters_webcam = np.array([[1.41405685e+03, 0.00000000e+00, 6.59924138e+02],[0.00000000e+00, 1.42191604e+03, 4.72514351e+02],[0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+#phones are shot at 30 fps
+camera_parameters_phone = np.array([[3.31609622e+03, 0.00000000e+00, 2.00609075e+03],[0.00000000e+00, 3.09535346e+03, 1.48778782e+03],[0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+
+camera_parameters = camera_parameters_phone
 DEFAULT_COLOR = (0, 0, 0)
 
 def main():
     #initialize homography
     homography_matrix = None
     #webcam stream capture
-    videocap = cv2.VideoCapture(0)
+    videocap = cv2.VideoCapture("../assets/videos/4phone.mp4")
+    #videocap = cv2.VideoCapture(0)
     videocap.set(3,1280)
     videocap.set(4,720)
     #image target
@@ -48,9 +52,11 @@ def main():
     obja = OBJ(os.path.join(dir_name, '../assets/models/rat.obj'), swapyz=True)
     objb = OBJ(os.path.join(dir_name, '../assets/models/fox.obj'), swapyz=True)
     
-    bf = cv2.BFMatcher()    
+    bf = cv2.BFMatcher()   
+    framecount = 0 
 
-    while True:
+    while True: #framewise detection
+        framecount += 1
         success, imgWebCam = videocap.read()
         kp2, des2 = orb.detectAndCompute(imgWebCam,None)
         matches_targets = []
@@ -77,10 +83,13 @@ def main():
                 pts = np.float32([[0,0],[0,hT[i]],[wT[i],hT[i]],[wT[i],0]]).reshape(-1,1,2)
                 dst = cv2.perspectiveTransform(pts, homography_matrix)
                 frame = cv2.polylines(imgWebCam,[np.int32(dst)],True,(255,0,0),3)
-                print(f"image {i} detected")
+                print(f"{framecount} image {i} detected")
             i += 1
-
-        cv2.imshow('frame',frame)
+        try:
+            cv2.imshow('frame',frame)
+        except:
+            pass
+        
 
         if cv2.waitKey(2) & 0xFF == ord('q'):
             break

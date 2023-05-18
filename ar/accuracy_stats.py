@@ -1,5 +1,5 @@
 import numpy as np
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as pyplot
 import re
 import sys
 
@@ -30,9 +30,10 @@ for line in s:
     if(line[0] == '-'):
         i+=1
         image = int(re.sub(x,"",line))
-        if(i >= n):
+
+        try:
             i = images.index(image)
-        else:
+        except(ValueError):
             images.append(image)
             frames.append(0)
     else:
@@ -40,16 +41,42 @@ for line in s:
         detection = int(line[2])
         counts[i][detection] += 1
         frames[i] += 1
-        
 
-print(images)
-print(counts)
-print(frames)
-scaled_counts = []
+scaled_counts = [] #scaling count data to frames
 for i in range(0,n):
     scaled_counts.append([])
     for count in counts[i]:
         count = count/frames[i]
         scaled_counts[i].append(count)
 
-print(scaled_counts)
+bardata = []
+imagelegend = []
+i = j = 0
+while(i < n):
+    images[i] = "Image " + str(images[i])
+    imagelegend.append(f"Image {i}")
+    j = 0
+    bardata.append([])
+    while(j<n):
+        bardata[i].append(scaled_counts[j][i])
+        j+=1
+    i+=1
+
+ind = np.arange(n)
+width = 0.1
+i = 0
+bars = []
+colors = ["tab:blue","tab:orange","tab:green","tab:red","tab:purple","tab:brown","tab:pink","tab:gray"]
+
+pyplot.figure(figsize=(15,10.5))
+while(i < n):
+    bars.append(pyplot.bar(ind + width*i, bardata[i], width, color=colors[i]))
+    i += 1
+
+pyplot.xlabel("Images")
+pyplot.ylabel("Detection count")
+pyplot.title("Detection distribution")
+
+pyplot.xticks(ind + width, images)
+pyplot.legend(bars,imagelegend)
+pyplot.show()

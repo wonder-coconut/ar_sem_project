@@ -8,14 +8,14 @@ camera_parameters_webcam = np.array([[1.41405685e+03, 0.00000000e+00, 6.59924138
 #phones are shot at 30 fps
 camera_parameters_phone = np.array([[3.31609622e+03, 0.00000000e+00, 2.00609075e+03],[0.00000000e+00, 3.09535346e+03, 1.48778782e+03],[0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
 
-camera_parameters = camera_parameters_phone
+camera_parameters = camera_parameters_webcam
 DEFAULT_COLOR = (0, 0, 0)
 
 def main():
     #initialize homography
     homography_matrix = None
     #webcam stream capture
-    videocap = cv2.VideoCapture("../assets/videos/4phone.mp4")
+    videocap = cv2.VideoCapture("../assets/videos/8webcam.mp4")
     #videocap = cv2.VideoCapture(0)
     videocap.set(3,1280)
     videocap.set(4,720)

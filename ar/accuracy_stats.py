@@ -4,11 +4,12 @@ import re
 import sys
 
 n = len(sys.argv)
-if(n != 2):
+if(n != 3):
     print("incorrect arguments")
+    exit()
 
 filename = sys.argv[1]
-n = int(filename[0]) #test data set size
+n = int(sys.argv[2])
 f = open(filename,"r")
 s = f.read().split("\n")
 s.pop()
@@ -63,10 +64,10 @@ while(i < n):
     i+=1
 
 ind = np.arange(n)
-width = 0.1
+width = 0.07
 i = 0
 bars = []
-colors = ["tab:blue","tab:orange","tab:green","tab:red","tab:purple","tab:brown","tab:pink","tab:gray"]
+colors = ["tab:blue","tab:orange","tab:green","tab:red","tab:purple","tab:brown","tab:pink","tab:gray","tab:olive","tab:cyan","k"]
 
 pyplot.figure(figsize=(15,10.5))
 while(i < n):

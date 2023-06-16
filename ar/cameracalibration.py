@@ -19,7 +19,7 @@ objp[0,:,:2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 prev_img_shape = None
  
 # Extracting path of individual image stored in a given directory
-images = glob.glob('../assets/images/calibration_phone/*.jpg')
+images = glob.glob('../assets/images/calibration_webcam/*.jpg')
 for fname in images:
     print("checking new image")
     img = cv2.imread(fname)
